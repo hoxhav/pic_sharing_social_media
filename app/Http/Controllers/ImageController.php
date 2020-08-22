@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use Illuminate\Http\Request;
+use Validator;
 
 class ImageController extends Controller
 {
 
     /**
+     * Third tasks, uploading picture
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -26,6 +29,40 @@ class ImageController extends Controller
         }
 
 
+        $validator = Validator::make($request->all(), [
+
+            'name' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+            'tags' => 'required|string|max:255',
+            'category_id' => 'required|integer',
+
+       ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $upload_path = public_path('assets/images/');
+        $file_name = time().'.'.$request['image']->getClientOriginalName();
+        $request['image']->move($upload_path, $file_name);
+
+        $path = $upload_path . $file_name;
+
+        $image = new Image();
+
+        $image->name = $request->input('name');
+        $image->path = $path;
+        $image->tags = $request->input('tags');
+        $image->user_id = $this->user->data->id;
+        $image->category_id = $request->input('category_id');
+
+        $image->save();
+
+        return response()->json([
+            "success" => true,
+            "data" => $image
+        ], 200);
+
     }
 
 
@@ -36,7 +73,7 @@ class ImageController extends Controller
      */
     public function index()
     {
-        //
+        return Image::all();
     }
 
     /**

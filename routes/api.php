@@ -21,7 +21,7 @@ Route::group(['middleware' => 'api','prefix' => 'user'], function ($router) {
 
 });
 
-Route::group(['middleware' => 'api','prefix' => 'images'], function ($router) {
+Route::group(['middleware' => 'api','prefix' => 'image'], function ($router) {
 
     Route::post('/upload', 'ImageController@upload');
 
