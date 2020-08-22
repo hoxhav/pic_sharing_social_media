@@ -2,6 +2,9 @@
 
 return [
 
+
+    'category_names' => [ "Dogs" , "Cats" , "Leisure", "Horses", "Dolphins", "Chimps", "Gorillas", "Other"],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

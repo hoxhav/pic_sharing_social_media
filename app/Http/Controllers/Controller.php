@@ -12,8 +12,14 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    protected $user;
+
+    public function __construct()
+    {
+        $this->user = $this->getAuthenticatedUser()->getData();
+    }
+
     /**
-     * TODO: to fix it
      * @return array
      */
     public function getAuthenticatedUser()
@@ -22,39 +28,45 @@ class Controller extends BaseController
 
             if (!$user = JWTAuth::parseToken()->authenticate()) {
 
-                return array(
-                    "response" => 404,
-                    "data" => "User was not found."
-                );
+                return  response()
+                    ->json(
+                        [
+                            "response" => 404,
+                            "data" => "User was not found."]
+                    );
 
             }
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 
-            return array(
-                "response" => 404,
-                "data" => "Your token session has expired. Please login again."
-            );
+            return response()
+                ->json(
+                    ["response" => 404,
+                        "data" => "Your token session has expired. Please login again."]
+                );
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
 
-            return array(
-                "response" => 404,
-                "data" => "Your token is invalid"
-            );
+            return response()
+                ->json(
+                    ["response" => 404,
+                        "data" => "Your token is invalid"]
+                );
 
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
 
-            return array(
-                "response" => 404,
-                "data" => "Something went wrong."
-            );
+            return response()
+                ->json(
+                    ["response" => 404,
+                        "data" => "Something went wrong."]
+                );
 
         }
 
-        return array(
-            "response" => 200,
-            "data" => $user
-        );
+        return response()
+            ->json(
+                [ "response" => 200,
+                    "data" => $user]
+            );
     }
 }

@@ -4,8 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class PhotoController extends Controller
+class ImageController extends Controller
 {
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function upload(Request $request) {
+
+        if($this->user->response !== 200) {
+
+            return response()->json([
+
+                "success" => false,
+
+                "data" => $this->user->data
+
+            ], 404);
+
+        }
+
+
+    }
+
+
     /**
      * Display a listing of the resource.
      *

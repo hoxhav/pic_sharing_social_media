@@ -10,12 +10,6 @@ use JWTAuth;
 class UserController extends Controller
 {
 
-    protected $user;
-
-    public function __construct()
-    {
-        $this->user = $this->getAuthenticatedUser();
-    }
 
 
     /**
@@ -72,6 +66,8 @@ class UserController extends Controller
     }
 
     /**
+     * Task: User can update email, and name.
+     *
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -80,10 +76,11 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        if($this->user['response'] !== 200) {
+
+        if($this->user->response !== 200) {
             return response()->json([
                 "success" => false,
-                "data" => $this->user['data']
+                "data" => $this->user->data
             ], 404);
         }
 
@@ -97,7 +94,7 @@ class UserController extends Controller
         }
 
 
-        $user =  User::find($this->user['data']['id']);
+        $user =  User::find($this->user->data->id);
 
 
         $update_data = array(
