@@ -212,6 +212,17 @@ class ImageController extends Controller
 
         $image = Image::select('path')->where('id', $request->input('id'))->get();
 
+        if(count($image) === 0) {
+
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+
+            // log
+        }
+
+
         return response()->download($image[0]['path']);
     }
 
