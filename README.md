@@ -12,3 +12,6 @@ This is an API for the backend of a picture sharing social media
 4) php artisan migrate
 
 5) check api.php file for routes
+
+
+Note: For each API call check methods Validations for required params. Also don't forget to add the Authorization as key and bearer JWT key you get from login.
