@@ -15,3 +15,6 @@ This is an API for the backend of a picture sharing social media
 
 
 Note: For each API call check methods Validations for required params. Also don't forget to add the Authorization as key and bearer JWT key you get from login.
+
+
+Note2: In real work I would make a Swagger.io workbench that includes real time testing and documentation for the Laravel API I have created.
