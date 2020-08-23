@@ -26,6 +26,7 @@ Route::group(['middleware' => 'api','prefix' => 'image'], function ($router) {
     Route::get('/list', 'ImageController@index');
     Route::get('/listMyImages', 'ImageController@listMyImages');
     Route::post('/upload', 'ImageController@upload');
+    Route::post('/search', 'ImageController@search');
 
 });
 

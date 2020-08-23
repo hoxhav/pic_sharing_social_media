@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Image;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -28,9 +29,11 @@ class ImageController extends Controller
 
         }
 
+        $images = Image::with('tag','category')->get();
+
         return response()->json([
             "success" => true,
-            "data" => Image::with('tag','category')->get()
+            "data" => $images
         ], 200);
 
     }
@@ -87,7 +90,7 @@ class ImageController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'category_id' => 'required|integer',
 
-       ]);
+        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -113,6 +116,57 @@ class ImageController extends Controller
             "data" => $image
         ], 200);
 
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request) {
+        if($this->user->response !== 200) {
+
+            return response()->json([
+
+                "success" => false,
+
+                "data" => $this->user->data
+
+            ], 404);
+
+        }
+
+        $validator = Validator::make($request->all(), [
+
+            'name_phrase' => 'required|string|max:255',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        //search by name image
+        $images = Image::with('category','tag')
+            ->where('name', 'like', '%'.$request->input('name_phrase').'%')
+            ->get();
+
+        //no result, search by tag
+        if(count($images) === 0) {
+
+            $images = Image::with('category', 'tag')
+                ->whereHas('tag',function ($query) use ($request) {
+
+                    $query->where('name', 'like', '%'.$request->input('name_phrase').'%');
+
+                })
+                ->get();
+
+        }
+
+        return response()->json([
+            "success" => true,
+            "data" => $images
+        ], 200);
     }
 
 }

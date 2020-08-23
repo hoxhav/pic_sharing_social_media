@@ -60,7 +60,7 @@ class TagController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $tags = Tag::with('image')->where('image_id', $request->input('image_id'))->get();
+        $tags = Tag::where('image_id', $request->input('image_id'))->get();
 
         return response()->json([
             "success" => true,
