@@ -8,4 +8,9 @@ class Category extends Model
 {
     protected $fillable = ['name'];
 
+    public function image()
+    {
+        return $this->hasMany('App\Models\Image');
+    }
+
 }

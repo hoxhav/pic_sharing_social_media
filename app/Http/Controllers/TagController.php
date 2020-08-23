@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Image;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Validator;
 
-class ImageController extends Controller
+class TagController extends Controller
 {
 
     /**
@@ -28,45 +28,15 @@ class ImageController extends Controller
 
         }
 
-        return response()->json([
-            "success" => true,
-            "data" => Image::with('tag','category')->get()
-        ], 200);
-
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function listMyImages()
-    {
-        if($this->user->response !== 200) {
-
-            return response()->json([
-
-                "success" => false,
-
-                "data" => $this->user->data
-
-            ], 404);
-
-        }
-
-        $images = Image::with('category', 'tag')->where('user_id', $this->user->data->id)->get();
+        $tags = Tag::all();
 
         return response()->json([
             "success" => true,
-            "data" => $images
+            "data" => $tags
         ], 200);
-
     }
 
-    /**
-     * Third tasks, uploading picture
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function upload(Request $request) {
+    public function listImageTags(Request $request) {
 
         if($this->user->response !== 200) {
 
@@ -79,40 +49,67 @@ class ImageController extends Controller
             ], 404);
 
         }
-
 
         $validator = Validator::make($request->all(), [
 
-            'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-            'category_id' => 'required|integer',
+            'image_id' => 'required|integer',
 
-       ]);
+        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $upload_path = public_path('assets/images/');
-        $file_name = time().'.'.$request['image']->getClientOriginalName();
-        $request['image']->move($upload_path, $file_name);
-
-        $path = $upload_path . $file_name;
-
-        $image = new Image();
-
-        $image->name = $request->input('name');
-        $image->path = $path;
-        $image->user_id = $this->user->data->id;
-        $image->category_id = $request->input('category_id');
-
-        $image->save();
+        $tags = Tag::with('image')->where('image_id', $request->input('image_id'))->get();
 
         return response()->json([
             "success" => true,
-            "data" => $image
+            "data" => $tags
         ], 200);
 
+    }
+
+    /**
+     * Search by category
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(Request $request) {
+
+        if($this->user->response !== 200) {
+
+            return response()->json([
+
+                "success" => false,
+
+                "data" => $this->user->data
+
+            ], 404);
+
+        }
+
+        $validator = Validator::make($request->all(), [
+
+            'name' => 'required|string|max:255',
+            'image_id' => 'required|integer',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $tag = new Tag();
+
+        $tag->name = $request->input('name');
+        $tag->image_id = $request->input('image_id');
+
+        $tag->save();
+
+        return response()->json([
+            "success" => true,
+            "data" => $tag
+        ], 200);
     }
 
 }

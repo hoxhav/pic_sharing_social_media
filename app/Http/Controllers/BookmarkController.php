@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Image;
+use App\Models\Bookmark;
 use Illuminate\Http\Request;
 use Validator;
 
-class ImageController extends Controller
+class BookmarkController extends Controller
 {
 
     /**
@@ -28,18 +28,20 @@ class ImageController extends Controller
 
         }
 
+        $bookmarks = Bookmark::with('image')->get();
+
         return response()->json([
             "success" => true,
-            "data" => Image::with('tag','category')->get()
+            "data" => $bookmarks
         ], 200);
-
     }
 
     /**
+     * Logged in user bookmarks
      * @return \Illuminate\Http\JsonResponse
      */
-    public function listMyImages()
-    {
+    public function userBookmarks() {
+
         if($this->user->response !== 200) {
 
             return response()->json([
@@ -52,22 +54,22 @@ class ImageController extends Controller
 
         }
 
-        $images = Image::with('category', 'tag')->where('user_id', $this->user->data->id)->get();
+
+        $bookmarks = Bookmark::with('image')->where('user_id', $this->user->data->id)->get();
 
         return response()->json([
             "success" => true,
-            "data" => $images
+            "data" => $bookmarks
         ], 200);
 
     }
 
     /**
-     * Third tasks, uploading picture
+     * Bookmark
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function upload(Request $request) {
-
+    public function create(Request $request) {
         if($this->user->response !== 200) {
 
             return response()->json([
@@ -80,39 +82,27 @@ class ImageController extends Controller
 
         }
 
-
         $validator = Validator::make($request->all(), [
 
-            'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-            'category_id' => 'required|integer',
+            'image_id' => 'required|integer',
 
-       ]);
+        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $upload_path = public_path('assets/images/');
-        $file_name = time().'.'.$request['image']->getClientOriginalName();
-        $request['image']->move($upload_path, $file_name);
+        $bookmark = new Bookmark();
 
-        $path = $upload_path . $file_name;
+        $bookmark->image_id = $request->input('image_id');
+        $bookmark->user_id = $this->user->data->id;
 
-        $image = new Image();
-
-        $image->name = $request->input('name');
-        $image->path = $path;
-        $image->user_id = $this->user->data->id;
-        $image->category_id = $request->input('category_id');
-
-        $image->save();
+        $bookmark->save();
 
         return response()->json([
             "success" => true,
-            "data" => $image
+            "data" => $bookmark
         ], 200);
-
     }
 
 }
