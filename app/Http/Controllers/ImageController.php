@@ -169,4 +169,38 @@ class ImageController extends Controller
         ], 200);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function download(Request $request) {
+
+        if($this->user->response !== 200) {
+
+            return response()->json([
+
+                "success" => false,
+
+                "data" => $this->user->data
+
+            ], 404);
+
+        }
+
+        $validator = Validator::make($request->all(), [
+
+            'id' => 'required|integer',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+
+        $image = Image::select('path')->where('id', $request->input('id'))->get();
+
+        return response()->download($image[0]['path']);
+    }
+
 }
