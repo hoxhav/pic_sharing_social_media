@@ -62,6 +62,13 @@ class TagController extends Controller
 
         $tags = Tag::where('image_id', $request->input('image_id'))->get();
 
+        if(count($tags) === 0) {
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+        }
+
         return response()->json([
             "success" => true,
             "data" => $tags

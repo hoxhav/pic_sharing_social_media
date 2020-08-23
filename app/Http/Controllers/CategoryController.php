@@ -68,6 +68,13 @@ class CategoryController extends Controller
 
         $images = Image::with('tag', 'category')->where('category_id', $request->input('category_id'))->get();
 
+        if(count($images) === 0) {
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+        }
+
         return response()->json([
             "success" => true,
             "data" => $images
