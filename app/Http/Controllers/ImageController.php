@@ -102,14 +102,26 @@ class ImageController extends Controller
 
         $path = $upload_path . $file_name;
 
-        $image = new Image();
+        try {
 
-        $image->name = $request->input('name');
-        $image->path = $path;
-        $image->user_id = $this->user->data->id;
-        $image->category_id = $request->input('category_id');
+            $image = new Image();
 
-        $image->save();
+            $image->name = $request->input('name');
+            $image->path = $path;
+            $image->user_id = $this->user->data->id;
+            $image->category_id = $request->input('category_id');
+
+            $image->save();
+
+        } catch(\Illuminate\Database\QueryException $ex){
+
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+
+            //log $ex->getMessage()
+        }
 
         return response()->json([
             "success" => true,

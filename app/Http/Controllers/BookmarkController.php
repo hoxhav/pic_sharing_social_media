@@ -92,12 +92,24 @@ class BookmarkController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $bookmark = new Bookmark();
+        try {
 
-        $bookmark->image_id = $request->input('image_id');
-        $bookmark->user_id = $this->user->data->id;
+            $bookmark = new Bookmark();
 
-        $bookmark->save();
+            $bookmark->image_id = $request->input('image_id');
+            $bookmark->user_id = $this->user->data->id;
+
+            $bookmark->save();
+
+        } catch(\Illuminate\Database\QueryException $ex){
+
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+
+            //log $ex->getMessage()
+        }
 
         return response()->json([
             "success" => true,

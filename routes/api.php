@@ -44,6 +44,7 @@ Route::group(['middleware' => 'api','prefix' => 'category'], function ($router) 
 
     Route::get('/list', 'CategoryController@index');
     Route::post('/listImagesByCategory', 'CategoryController@filterByCategory');
+    Route::post('/create', 'CategoryController@create');
 
 });
 

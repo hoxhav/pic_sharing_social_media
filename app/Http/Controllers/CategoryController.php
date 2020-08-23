@@ -74,4 +74,56 @@ class CategoryController extends Controller
         ], 200);
     }
 
+    /**
+     * Bookmark
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(Request $request) {
+        if($this->user->response !== 200) {
+
+            return response()->json([
+
+                "success" => false,
+
+                "data" => $this->user->data
+
+            ], 404);
+
+        }
+
+        $validator = Validator::make($request->all(), [
+
+            'name' => 'required|string|max:255',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        try {
+
+            $category = new Category();
+
+            $category->name = $request->input('name');
+
+            $category->save();
+
+        } catch(\Illuminate\Database\QueryException $ex){
+
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+
+            //log $ex->getMessage()
+        }
+
+        return response()->json([
+            "success" => true,
+            "data" => $category
+        ], 200);
+    }
+
 }

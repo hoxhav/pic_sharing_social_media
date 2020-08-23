@@ -99,12 +99,26 @@ class TagController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $tag = new Tag();
+        try {
 
-        $tag->name = $request->input('name');
-        $tag->image_id = $request->input('image_id');
+            $tag = new Tag();
 
-        $tag->save();
+            $tag->name = $request->input('name');
+            $tag->image_id = $request->input('image_id');
+
+            $tag->save();
+
+        } catch(\Illuminate\Database\QueryException $ex){
+
+            return  response()->json([
+                "success" => false,
+                "data" => "Something went wrong with your query."
+            ], 200);
+
+            //log $ex->getMessage()
+        }
+
+
 
         return response()->json([
             "success" => true,
